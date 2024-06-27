@@ -1,22 +1,13 @@
 import React, { useState } from 'react';
+import { Form, Input, Button, message } from 'antd';
+import 'antd/dist/antd.css';
 
 const AddUserForm = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [form] = Form.useForm();
   const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name || !email) {
-      setError('Both fields are required');
-      return;
-    }
-    if (!/\S+@\S+\.\S+/.test(email)) {
-      setError('Invalid email address');
-      return;
-    }
-    setError('');
-
+  const handleSubmit = (values) => {
+    const { name, email } = values;
     fetch('http://example.com/user', {
       method: 'POST',
       headers: {
@@ -26,30 +17,43 @@ const AddUserForm = () => {
     })
       .then(response => response.json())
       .then(data => {
-        setName('');
-        setEmail('');
+        message.success('User added successfully');
+        form.resetFields();
       })
-      .catch(error => console.error('Error adding user:', error));
+      .catch(error => {
+        console.error('Error adding user:', error);
+        message.error('Failed to add user');
+      });
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>
-          Name:
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Email:
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-        </label>
-      </div>
+    <Form form={form} onFinish={handleSubmit} layout="vertical">
+      <Form.Item
+        name="name"
+        label="Name"
+        rules={[{ required: true, message: 'Please input your name!' }]}
+      >
+        <Input />
+      </Form.Item>
+      <Form.Item
+        name="email"
+        label="Email"
+        rules={[
+          { required: true, message: 'Please input your email!' },
+          { type: 'email', message: 'Please enter a valid email!' },
+        ]}
+      >
+        <Input />
+      </Form.Item>
       {error && <p>{error}</p>}
-      <button type="submit">Add User</button>
-    </form>
+      <Form.Item>
+        <Button type="primary" htmlType="submit">
+          Add User
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 
 export default AddUserForm;
+
