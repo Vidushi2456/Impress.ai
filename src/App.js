@@ -22,4 +22,20 @@ const mapDispatchToProps = {
   addUser,
 };
 
+import UserList from './components/UserList';
+import AddUserForm from './components/AddUserForm';
+
+const App = () => {
+  return (
+    <div>
+      <h1>User Management</h1>
+      <AddUserForm />
+      <UserList />
+    </div>
+  );
+};
+
+export default App;
+
+
 export default connect(mapStateToProps, mapDispatchToProps)(App);
